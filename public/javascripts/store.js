@@ -111,6 +111,28 @@ class Store {
     }
   }
 
+  async createSetupIntent(currency, items) {
+    try {
+      const response = await fetch('/setup_intents', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          currency,
+          items,
+        }),
+      });
+      const data = await response.json();
+      if (data.error) {
+        return {error: data.error};
+      } else {
+        return data;
+      }
+    } catch (err) {
+      return {error: err.message};
+    }
+  }
+
+
   // Create the PaymentIntent with the cart details.
   async updatePaymentIntentWithShippingCost(
     paymentIntent,

@@ -23,6 +23,7 @@
 
   // Global variable to store the PaymentIntent object.
   let paymentIntent;
+  let clientSecret;
 
   /**
    * Setup Stripe Elements.
@@ -142,31 +143,21 @@
     currency: config.currency,
     total: {
       label: 'Total',
-      amount: store.getPaymentTotal(),
+      amount: 0,
     },
-    requestShipping: true,
+    requestPayerPhone: true,
     requestPayerEmail: true,
-    shippingOptions: config.shippingOptions,
   });
 
   // Callback when a payment method is created.
   paymentRequest.on('paymentmethod', async event => {
     // Confirm the PaymentIntent with the payment method returned from the payment request.
-    const {error} = await stripe.confirmCardPayment(
-      paymentIntent.client_secret,
+    //const {error} = await stripe.confirmCardPayment(
+    const {error} = await stripe.confirmCardSetup(
+      //paymentIntent.client_secret,
+      clientSecret,
       {
         payment_method: event.paymentMethod.id,
-        shipping: {
-          name: event.shippingAddress.recipient,
-          phone: event.shippingAddress.phone,
-          address: {
-            line1: event.shippingAddress.addressLine[0],
-            city: event.shippingAddress.city,
-            postal_code: event.shippingAddress.postalCode,
-            state: event.shippingAddress.region,
-            country: event.shippingAddress.country,
-          },
-        },
       },
       {handleActions: false}
     );
@@ -179,8 +170,9 @@
       // it to close the browser payment method collection interface.
       event.complete('success');
       // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
-      const response = await stripe.confirmCardPayment(
-        paymentIntent.client_secret
+      const response = await stripe.confirmCardSetup(
+        clientSecret
+        //paymentIntent.client_secret
       );
       handlePayment(response);
     }
@@ -195,7 +187,8 @@
   paymentRequest.on('shippingoptionchange', async event => {
     // Update the PaymentIntent to reflect the shipping cost.
     const response = await store.updatePaymentIntentWithShippingCost(
-      paymentIntent.id,
+      setupIntent.id, //TODO broken
+      //paymentIntent.id,
       store.getLineItems(),
       event.shippingOption
     );
@@ -257,6 +250,7 @@
     const name = form.querySelector('input[name=name]').value;
     const country = form.querySelector('select[name=country] option:checked')
       .value;
+    const phone = '0123456789'
     const email = form.querySelector('input[name=email]').value;
     const shipping = {
       name,
@@ -274,23 +268,28 @@
 
     if (payment === 'card') {
       // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
-      const response = await stripe.confirmCardPayment(
-        paymentIntent.client_secret,
+      const response = await stripe.confirmCardPayment(  //CHANGE
+      // const response = await stripe.confirmCardSetup(
+        clientSecret,
+        //paymentIntent.client_secret,
         {
           payment_method: {
             card,
             billing_details: {
               name,
+              email,
+              phone,
+              address: shipping.address,
             },
           },
-          shipping,
         }
       );
       handlePayment(response);
     } else if (payment === 'sepa_debit') {
       // Confirm the PaymentIntent with the IBAN Element.
       const response = await stripe.confirmSepaDebitPayment(
-        paymentIntent.client_secret,
+        clientSecret,
+        //paymentIntent.client_secret,
         {
           payment_method: {
             sepa_debit: iban,
@@ -355,6 +354,7 @@
 
   // Handle new PaymentIntent result
   const handlePayment = paymentResponse => {
+    // const {setupIntent, error} = paymentResponse;  //CHANGE
     const {paymentIntent, error} = paymentResponse;
 
     const mainElement = document.getElementById('main');
@@ -553,11 +553,17 @@
     mainElement.classList.add('checkout');
 
     // Create the PaymentIntent with the cart details.
-    const response = await store.createPaymentIntent(
+    // const response = await store.createPaymentIntent(
+    //   config.currency,
+    //   store.getLineItems()
+    // );
+    // paymentIntent = response.paymentIntent;
+
+    const response = await store.createSetupIntent(
       config.currency,
       store.getLineItems()
     );
-    paymentIntent = response.paymentIntent;
+    clientSecret = response.clientSecret;
   }
   document.getElementById('main').classList.remove('loading');
 

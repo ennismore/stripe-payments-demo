@@ -10,11 +10,14 @@
 require('dotenv').config();
 
 module.exports = {
+  emApiUrl: 'http://localhost:8000/v2', //'https://api.dev.env.ennismore.com/v2'
+  emApiKey: 'RMP1ZpyFrWFBtJBHqa16', //onprem'op6RBIpH81ER1kpb28tF', 
+
   // Default country for the checkout form.
-  country: 'US',
+  country: 'GB',
 
   // Store currency.
-  currency: 'eur',
+  currency: 'gbp',
 
   // Supported payment methods for the store.
   // Some payment methods support only a subset of currencies.
@@ -69,14 +72,14 @@ module.exports = {
   ],
 
   // Server port.
-  port: process.env.PORT || 8000,
+  port: process.env.PORT || 6666,
 
   // Tunnel to serve the app over HTTPS and be able to receive webhooks locally.
   // Optionally, if you have a paid ngrok account, you can specify your `subdomain`
   // and `authtoken` in your `.env` file to use it.
   ngrok: {
     enabled: process.env.NODE_ENV !== 'production',
-    port: process.env.PORT || 8000,
+    port: process.env.PORT || 6666,
     subdomain: process.env.NGROK_SUBDOMAIN,
     authtoken: process.env.NGROK_AUTHTOKEN,
   },
