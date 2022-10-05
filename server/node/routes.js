@@ -55,21 +55,21 @@ router.post('/setup_intents', async (req, res, next) => {
 
   try { 
     const prePayment = {
-        hotelReferenceId: "townhouse",
+        hotel_reference_id: "rome",
         metadata: {
           //title: "MR",
           email: "mryan321+stripe@gmail.com",
-          bookingId: "09e4e71653a17ecab2a5ce1809826012c7a0a90a",
-          specialAssistance: true,
+          booking_id: "c9828629e2942e1bae41976b596a3e86ac022f00",
+          special_assistance: true,
           //charity: 2,
           //comment: "special requests...",
           //comment: "FAIL_CONFIRM",
-          marketingOptIn: true,
+          marketing_opt_in: true,
           //flexyTime: { checkIn:"HOUR_0_TO_1", checkOut:"HOUR_4_TO_5" }
         }
     }
     const rawResponse = await fetch(
-      config.emApiUrl + `/payments/stripe`,
+      config.emApiUrl + `/payment/stripe`,
       {
         method: 'POST',
         headers: {
@@ -80,7 +80,7 @@ router.post('/setup_intents', async (req, res, next) => {
       }
     );
     const response = await rawResponse.json();
-    const secret = response.clientSecret
+    const secret = response.client_secret
     console.log("CREATED: " + secret + ":::" + response.method)
     return res.status(200).json({clientSecret: secret});
   } catch (err) {

@@ -10,8 +10,8 @@
 require('dotenv').config();
 
 module.exports = {
-  emApiUrl: 'http://localhost:8000/v2', //'https://api.dev.env.ennismore.com/v2'
-  emApiKey: 'RMP1ZpyFrWFBtJBHqa16', //onprem'op6RBIpH81ER1kpb28tF', 
+  emApiUrl: 'http://localhost:18000/v3', //'https://api.dev.env.ennismore.com/v2'
+  emApiKey: 'opeKXSzWcwU97kSPVe5v', //onprem'op6RBIpH81ER1kpb28tF', 
 
   // Default country for the checkout form.
   country: 'GB',

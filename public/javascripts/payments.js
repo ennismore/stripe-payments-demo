@@ -268,8 +268,8 @@
 
     if (payment === 'card') {
       // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
-      const response = await stripe.confirmCardPayment(  //CHANGE
-      // const response = await stripe.confirmCardSetup(
+      // const response = await stripe.confirmCardPayment(  //CHANGE
+      const response = await stripe.confirmCardSetup(
         clientSecret,
         //paymentIntent.client_secret,
         {
@@ -354,8 +354,8 @@
 
   // Handle new PaymentIntent result
   const handlePayment = paymentResponse => {
-    // const {setupIntent, error} = paymentResponse;  //CHANGE
-    const {paymentIntent, error} = paymentResponse;
+    const {setupIntent, error} = paymentResponse;  //CHANGE
+    // const {paymentIntent, error} = paymentResponse;
 
     const mainElement = document.getElementById('main');
     const confirmationElement = document.getElementById('confirmation');
@@ -366,7 +366,7 @@
       confirmationElement.querySelector('.error-message').innerText =
         error.message;
       mainElement.classList.add('error');
-    } else if (paymentIntent.status === 'succeeded') {
+    } else if (setupIntent.status === 'succeeded') {
       // Success! Payment is confirmed. Update the interface to display the confirmation screen.
       mainElement.classList.remove('processing');
       mainElement.classList.remove('receiver');
@@ -374,7 +374,7 @@
       confirmationElement.querySelector('.note').innerText =
         'We just sent your receipt to your email address, and your items will be on their way shortly.';
       mainElement.classList.add('success');
-    } else if (paymentIntent.status === 'processing') {
+    } else if (setupIntent.status === 'processing') {
       // Success! Now waiting for payment confirmation. Update the interface to display the confirmation screen.
       mainElement.classList.remove('processing');
       // Update the note about receipt and shipping (the payment is not yet confirmed by the bank).
